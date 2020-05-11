@@ -1,15 +1,7 @@
-//
-//  main.cpp
-//  ApiClient-Demo
-//
-//  Created by Leonid on 3/14/18.
-//  Copyright © 2018 oatpp. All rights reserved.
-//
+#include "IoTClient.hpp"
 
-#include "AsyncExample.hpp"
-#include "SimpleExample.hpp"
 
-#include "DemoApiClient.hpp"
+#include "HttpRequest.hpp"
 
 #include "oatpp-curl/RequestExecutor.hpp"
 
@@ -20,23 +12,25 @@
 
 #include <iostream>
 #include <sys/time.h>
+
 using namespace std;
 using namespace oatpp;
 using namespace base;
+using namespace IoT;
 
 double time_simple_example;
 double time_async_example;
 
-std::shared_ptr<oatpp::web::client::RequestExecutor> createOatppExecutor() {
+std::shared_ptr<oatpp::web::client::RequestExecutor> createExecutor() {
   OATPP_LOGD("App", "Using Oat++ native HttpRequestExecutor.");
   auto connectionProvider = oatpp::network::client::SimpleTCPConnectionProvider::createShared("httpbin.org", 80);
   return oatpp::web::client::HttpRequestExecutor::createShared(connectionProvider);
 }
 
-std::shared_ptr<oatpp::web::client::RequestExecutor> createCurlExecutor() {
-  OATPP_LOGD("App", "Using oatpp-curl RequestExecutor.");
-  return oatpp::curl::RequestExecutor::createShared("http://httpbin.org/", true /* set verbose=true for dubug info */);
-}
+// std::shared_ptr<oatpp::web::client::RequestExecutor> createCurlExecutor() {
+//   OATPP_LOGD("App", "Using oatpp-curl RequestExecutor.");
+//   return oatpp::curl::RequestExecutor::createShared("http://httpbin.org/", true /* set verbose=true for dubug info */);
+// }
 
 double get_stime(){
 	struct timeval current_time;	
@@ -50,12 +44,12 @@ void run(){
   auto objectMapper = oatpp::parser::json::mapping::ObjectMapper::createShared();
   
   /* Create RequestExecutor which will execute ApiClient's requests */
-  auto requestExecutor = createOatppExecutor();   // <-- Always use oatpp native executor where's possible.
+  auto requestExecutor = createExecutor();   // <-- Always use oatpp native executor where's possible.
   //auto requestExecutor = createCurlExecutor();  // <-- Curl request executor
   
   /* DemoApiClient uses DemoRequestExecutor and json::mapping::ObjectMapper */
   /* ObjectMapper passed here is used for serialization of outgoing DTOs */
-  auto client = DemoApiClient::createShared(requestExecutor, objectMapper);
+  auto client = HttpRequest::createShared(requestExecutor, objectMapper);
   
   double init_time = get_stime();
   //SimpleExample::runExample(client);
@@ -63,7 +57,7 @@ void run(){
   time_simple_example = end_time - init_time;
 
   init_time = get_stime();
-  AsyncExample::runExample(client);
+  IoTClient::runClient(client);
   end_time = get_stime();
 
   time_async_example = end_time - init_time;

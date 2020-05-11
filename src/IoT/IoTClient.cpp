@@ -1,13 +1,10 @@
-//
-// Created by Leonid  on 2019-05-27.
-//
-
-#include "AsyncExample.hpp"
+#include "IoTClient.hpp"
 using namespace std;
+using namespace IoT;
 
-void AsyncExample::runExample(const std::shared_ptr<DemoApiClient>& client) {
 
-  //oatpp::async::Executor executor(1, 1, 1);
+void IoTClient::runClient(const std::shared_ptr<HttpRequest>& client){
+	//oatpp::async::Executor executor(1, 1, 1);
   oatpp::async::Executor executor(2, 1, 1);
 
   executor.execute<SendDtoCoroutine>(client, "message1", 10000);
